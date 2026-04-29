@@ -4,370 +4,365 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Threat Model Builder — Predaxia</title>
-<meta name="description" content="Build your personal threat model in 3 minutes. 7 profiles, personalized score, actionable steps. No data collected, no account needed.">
+<meta name="description" content="Build your personal threat model in 3 minutes. 5 questions, OPSEC score, vulnerabilities identified, action plan. Runs in your browser. No data collected.">
+<meta name="author" content="Predaxia">
+<meta property="og:title" content="Threat Model Builder — Predaxia">
+<meta property="og:description" content="3 minutes. 5 questions. A personalized OPSEC score for journalists, lawyers, NGOs, military families, divorce, high-risk travel. No data collected.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://predaxia.com/threat-model-builder/">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"HowTo","name":"Build your personal threat model in 3 minutes","description":"An interactive threat model builder for journalists, lawyers, NGO workers, military families, divorce, high-risk travel, and anyone with something to lose.","totalTime":"PT3M","estimatedCost":{"@type":"MonetaryAmount","currency":"EUR","value":"0"},"step":[{"@type":"HowToStep","name":"Pick your profile"},{"@type":"HowToStep","name":"List your assets"},{"@type":"HowToStep","name":"Identify adversaries"},{"@type":"HowToStep","name":"Audit your current setup"},{"@type":"HowToStep","name":"Get your OPSEC score"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Should I use this builder or read the article instead?","acceptedAnswer":{"@type":"Answer","text":"Both. The builder gives you a personalized result in three minutes. The article on how to build a threat model in 20 minutes explains the method."}},{"@type":"Question","name":"Is this Threat Model Builder free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Runs entirely in your browser. No account, no email, no payment, no tracking."}},{"@type":"Question","name":"How is this different from Microsoft Threat Modeling Tool or OWASP Threat Dragon?","acceptedAnswer":{"@type":"Answer","text":"Those tools are designed for software architects modeling application threats. This builder is designed for individuals modeling personal exposure."}},{"@type":"Question","name":"Why are data brokers in the questionnaire?","acceptedAnswer":{"@type":"Answer","text":"Data brokers aggregate your home address, phone, and family members into commercial databases. For most adversary models, this is the cheapest entry point."}},{"@type":"Question","name":"Will my answers be saved if I close the page?","acceptedAnswer":{"@type":"Answer","text":"No. By design. The promise of zero storage is incompatible with persistence. Copy or print your result if you want to keep it."}}]}]}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-@keyframes tmb-fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-body{background:#0a0a0a;color:#e8e8e8;font-family:'Inter',system-ui,sans-serif;margin:0;padding:0}
-#tmb{max-width:720px;margin:0 auto;padding:40px 24px 80px}
-.tmb-fade{animation:tmb-fade 0.35s ease-out}
+body{background:#0a0a0a;color:#e8e8e8;font-family:"Inter",system-ui,sans-serif;line-height:1.5}
+
+#predaxia-tmb-intro{max-width:760px;margin:0 auto;padding:60px 24px 30px}
+.tmb-i-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c0392b;border:1px solid #c0392b33;padding:6px 16px;margin-bottom:24px}
+.tmb-i-h1{font-family:"Space Grotesk",sans-serif;font-size:clamp(1.9rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;line-height:1.05;margin:0 0 10px;color:#e8e8e8}
+.tmb-i-sub{font-family:"Space Grotesk",sans-serif;font-size:clamp(0.95rem,2vw,1.1rem);font-weight:500;color:#888;line-height:1.4;margin:0 0 14px}
+.tmb-i-redline{width:48px;height:3px;background:#c0392b;margin:20px 0 24px}
+.tmb-i-lede{font-size:17px;line-height:1.55;color:#bbb;margin:0 0 20px}
+.tmb-i-meta{font-size:11px;color:#555;letter-spacing:1px;text-transform:uppercase;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.tmb-i-dispatch{font-size:14px;color:#888;border-top:1px solid #1a1a1a;padding-top:18px;margin-top:18px}
+.tmb-i-dispatch a{color:#c0392b;text-decoration:none;font-weight:600}
+
+#predaxia-tmb{max-width:760px;margin:0 auto;padding:20px 24px 60px}
 .tmb-progress{display:flex;gap:4px;margin-bottom:40px}
 .tmb-pdot{flex:1;height:3px;background:#1a1a1a;transition:background 0.4s}
 .tmb-pdot.done{background:#c0392b}
 .tmb-pdot.active{background:#c0392b88}
-.tmb-slabel{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c0392b;margin-bottom:8px}
-.tmb-stitle{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.1rem,3vw,1.4rem);font-weight:700;color:#e8e8e8;margin-bottom:8px;line-height:1.2}
-.tmb-sdesc{font-size:13px;color:#777;margin-bottom:32px;line-height:1.5}
+.tmb-slabel{font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c0392b;margin-bottom:8px}
+.tmb-stitle{font-family:"Space Grotesk",sans-serif;font-size:clamp(1.2rem,3vw,1.5rem);font-weight:700;color:#e8e8e8;margin-bottom:8px;line-height:1.2}
+.tmb-sdesc{font-size:13px;color:#888;margin-bottom:32px;line-height:1.55}
 .tmb-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tmb-pcard{background:#111;border:1px solid #1e1e1e;padding:20px 16px;cursor:pointer;transition:all 0.2s;text-align:left}
-.tmb-pcard.sel{background:#c0392b11;border-color:#c0392b}
-.tmb-icon{font-size:22px;margin-bottom:8px;display:block}
-.tmb-plabel{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#e8e8e8;margin-bottom:4px}
+.tmb-pcard{background:#111;border:1px solid #1e1e1e;padding:20px 16px;cursor:pointer;transition:all 0.2s;text-align:left;display:flex;flex-direction:column;align-items:flex-start}
+.tmb-pcard:hover{border-color:#333;background:#141414}
+.tmb-pcard.sel{background:#c0392b14;border-color:#c0392b}
+.tmb-icon{display:flex;align-items:center;justify-content:center;width:32px;height:32px;margin-bottom:10px;color:#c0392b}
+.tmb-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tmb-plabel{font-family:"Space Grotesk",sans-serif;font-size:14px;font-weight:700;color:#e8e8e8;margin-bottom:4px}
 .tmb-psub{font-size:11px;color:#666;line-height:1.4}
-.tmb-anyone{margin-top:10px;display:flex;align-items:center;gap:16px}
+.tmb-anyone{margin-top:10px;flex-direction:row !important;align-items:center;gap:14px}
+.tmb-anyone .tmb-icon{margin-bottom:0;flex-shrink:0}
 .tmb-chk{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#111;border:1px solid #1e1e1e;cursor:pointer;transition:all 0.2s;margin-bottom:6px}
-.tmb-chk.sel{background:#c0392b11;border-color:#c0392b}
+.tmb-chk:hover{border-color:#333}
+.tmb-chk.sel{background:#c0392b14;border-color:#c0392b}
 .tmb-box{width:18px;height:18px;border:2px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:#fff;transition:all 0.15s}
 .tmb-box.on{border-color:#c0392b;background:#c0392b}
-.tmb-clbl{font-size:14px;color:#ccc}
+.tmb-clbl{font-size:14px;color:#ccc;flex:1}
 .tmb-dots{display:flex;gap:3px;margin-left:auto;flex-shrink:0}
 .tmb-dot{width:6px;height:6px;border-radius:50%;background:#333}
 .tmb-dot.on{background:#c0392b}
-.tmb-srow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1a1a1a;flex-wrap:wrap;gap:8px}
-.tmb-sq{font-size:14px;color:#ccc;font-weight:500;min-width:160px}
+.tmb-srow{padding:16px 0;border-bottom:1px solid #1a1a1a}
+.tmb-srow:last-child{border-bottom:none}
+.tmb-sqhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.tmb-sq{font-size:14px;color:#ccc;font-weight:600;font-family:"Space Grotesk",sans-serif}
+.tmb-sqctx{font-size:11px;color:#666;font-style:italic;margin-bottom:10px;line-height:1.4}
 .tmb-sopts{display:flex;gap:6px;flex-wrap:wrap}
-.tmb-sbtn{font-size:11px;padding:6px 12px;background:#1a1a1a;color:#888;border:1px solid #252525;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.tmb-sbtn{font-size:11px;padding:7px 13px;background:#1a1a1a;color:#888;border:1px solid #252525;cursor:pointer;transition:all 0.15s;font-family:"Inter",sans-serif;white-space:nowrap}
+.tmb-sbtn:hover{border-color:#444;color:#bbb}
 .tmb-sbtn.sel{background:#c0392b;color:#fff;border-color:#c0392b}
-.tmb-nav{display:flex;justify-content:space-between;margin-top:40px}
-.tmb-btn{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 32px;cursor:pointer;transition:all 0.2s;border:none}
+.tmb-sqdone{font-size:10px;color:#2ecc71;letter-spacing:2px;text-transform:uppercase}
+.tmb-sqtodo{font-size:10px;color:#666;letter-spacing:2px;text-transform:uppercase}
+.tmb-stepcounter{display:flex;align-items:center;justify-content:space-between;background:#111;border:1px solid #1e1e1e;padding:14px 18px;margin-bottom:24px}
+.tmb-stepcounter-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#888;font-family:"Space Grotesk",sans-serif}
+.tmb-stepcounter-num{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:800;color:#c0392b}
+.tmb-nav{display:flex;justify-content:space-between;margin-top:40px;gap:12px}
+.tmb-btn{font-family:"Space Grotesk",sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 32px;cursor:pointer;transition:all 0.2s;border:none}
 .tmb-btn.pri{background:#c0392b;color:#fff}
-.tmb-btn.pri.dis{background:#441a15;color:#666;cursor:not-allowed}
+.tmb-btn.pri:hover{background:#a93226}
+.tmb-btn.pri.dis{background:#2a1310;color:#666;cursor:not-allowed}
 .tmb-btn.sec{background:transparent;color:#888;border:1px solid #333}
-.tmb-score{width:100px;height:100px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;border-width:3px;border-style:solid}
-.tmb-snum{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;line-height:1}
-.tmb-slbl2{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:4px}
-.tmb-vuln{background:#111;padding:16px 20px;margin-bottom:10px;border-left:3px solid}
-.tmb-vtitle{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:#e8e8e8;margin-bottom:6px}
-.tmb-vsev{font-size:10px;font-weight:400;margin-left:8px;text-transform:uppercase;letter-spacing:1px}
-.tmb-vtxt{font-size:13px;color:#999;line-height:1.5;margin-bottom:8px}
+.tmb-score{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;border-width:3px;border-style:solid}
+.tmb-snum{font-family:"Space Grotesk",sans-serif;font-size:38px;font-weight:800;line-height:1}
+.tmb-slbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:4px}
+.tmb-vuln{background:#111;padding:18px 20px;margin-bottom:10px;border-left:3px solid}
+.tmb-vtitle{font-family:"Space Grotesk",sans-serif;font-size:14px;font-weight:700;color:#e8e8e8;margin-bottom:6px}
+.tmb-vsev{font-size:10px;font-weight:600;margin-left:8px;text-transform:uppercase;letter-spacing:1px}
+.tmb-vtxt{font-size:13px;color:#aaa;line-height:1.55;margin-bottom:10px}
 .tmb-alink{font-size:12px;color:#c0392b;text-decoration:none;font-weight:600}
-.tmb-sectitle{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c0392b;margin:40px 0 16px}
-.tmb-rcard{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#111;border-bottom:1px solid #1a1a1a;text-decoration:none;color:#ccc;font-size:14px;line-height:1.4}
-.tmb-rarrow{margin-left:auto;color:#c0392b;font-size:14px;flex-shrink:0}
+.tmb-sectitle{font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c0392b;margin:40px 0 16px}
+.tmb-toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.tmb-tool{background:#111;border:1px solid #1e1e1e;padding:16px;text-decoration:none;display:block;transition:all 0.2s}
+.tmb-tool:hover{border-color:#c0392b66;background:#141414}
+.tmb-tname{font-family:"Space Grotesk",sans-serif;font-size:14px;font-weight:700;color:#e8e8e8;margin-bottom:4px}
+.tmb-tdesc{font-size:12px;color:#888;line-height:1.45}
+.tmb-stickynl{position:sticky;bottom:0;z-index:10;background:linear-gradient(180deg,rgba(10,10,10,0),#0a0a0a 30%,#0a0a0a);padding:20px 0 0;margin:32px 0 0}
+.tmb-stickynl-inner{background:#c0392b;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tmb-stickynl-txt{color:#fff;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:14px}
+.tmb-stickynl-txt small{display:block;font-weight:400;font-size:11px;opacity:0.85;margin-top:3px;font-family:"Inter",sans-serif}
+.tmb-stickynl-btn{background:#0a0a0a;color:#fff;font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 22px;text-decoration:none;white-space:nowrap;transition:all 0.2s}
+.tmb-stickynl-btn:hover{background:#fff;color:#c0392b}
 .tmb-closebox{border-top:1px solid #1e1e1e;margin-top:48px;padding-top:32px;text-align:center}
-.tmb-closing{font-size:13px;color:#555;font-style:italic;line-height:1.6;max-width:500px;margin:0 auto 24px}
+.tmb-closing{font-size:13px;color:#666;font-style:italic;line-height:1.6;max-width:540px;margin:0 auto 24px}
 .tmb-ctabox{background:#111;border:1px solid #1e1e1e;padding:24px;text-align:center}
-.tmb-ctatitle{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#e8e8e8;margin-bottom:8px}
-.tmb-ctatxt{font-size:13px;color:#777;margin-bottom:16px;line-height:1.5}
-.tmb-sharebtn{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;background:transparent;color:#c0392b;border:1px solid #c0392b;cursor:pointer;margin-top:12px}
-.tmb-privnote{font-size:11px;color:#444;text-align:center;margin-top:32px;font-style:italic}
-.tmb-restart{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;background:transparent;color:#555;border:1px solid #252525;cursor:pointer;display:block;margin:24px auto 0}
-@media(max-width:480px){.tmb-grid2{grid-template-columns:1fr}.tmb-srow{flex-direction:column;align-items:flex-start}}
+.tmb-ctatitle{font-family:"Space Grotesk",sans-serif;font-size:15px;font-weight:700;color:#e8e8e8;margin-bottom:8px}
+.tmb-ctatxt{font-size:13px;color:#888;margin-bottom:16px;line-height:1.5}
+.tmb-ctabtnrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tmb-sharebtn,.tmb-printbtn{font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 22px;background:transparent;color:#c0392b;border:1px solid #c0392b;cursor:pointer}
+.tmb-sharebtn:hover,.tmb-printbtn:hover{background:#c0392b;color:#fff}
+.tmb-privnote{font-size:11px;color:#444;text-align:center;margin-top:32px;font-style:italic;line-height:1.5}
+.tmb-restart-pri{display:block;margin:32px auto 0;padding:16px 36px;background:transparent;color:#c0392b;border:2px solid #c0392b;font-family:"Space Grotesk",sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+.tmb-restart-pri:hover{background:#c0392b;color:#fff}
+.tmb-fade{animation:tmbFade 0.35s ease-out}
+@keyframes tmbFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+#predaxia-tmb-faq{max-width:760px;margin:0 auto;padding:40px 24px 80px;border-top:1px solid #1a1a1a}
+.tmb-f-h2{font-family:"Space Grotesk",sans-serif;font-size:clamp(1.4rem,3.5vw,1.8rem);font-weight:800;color:#e8e8e8;margin:20px 0 32px;letter-spacing:-0.01em}
+.tmb-f-h3{font-family:"Space Grotesk",sans-serif;font-size:16px;font-weight:700;color:#e8e8e8;margin:28px 0 10px}
+.tmb-f-p{font-size:14px;line-height:1.65;color:#aaa;margin:0 0 16px}
+.tmb-f-p a{color:#c0392b;text-decoration:none;font-weight:600}
+
+@media(max-width:768px){.tmb-grid2,.tmb-toolgrid{grid-template-columns:1fr}.tmb-sqhead{flex-direction:column;align-items:flex-start}.tmb-stickynl-inner{flex-direction:column;text-align:center}#predaxia-tmb-intro,#predaxia-tmb,#predaxia-tmb-faq{padding-left:18px;padding-right:18px}}
+
+@media print{
+  body *{visibility:hidden}
+  #predaxia-tmb,#predaxia-tmb *{visibility:visible}
+  #predaxia-tmb{position:absolute;left:0;top:0;width:100%;background:#fff !important;color:#000 !important}
+  .tmb-progress,.tmb-nav,.tmb-stickynl,.tmb-restart-pri,.tmb-ctabtnrow{display:none !important}
+  .tmb-stitle,.tmb-vtitle,.tmb-tname,.tmb-ctatitle{color:#000 !important}
+  .tmb-vtxt,.tmb-tdesc,.tmb-clbl,.tmb-closing{color:#333 !important}
+  .tmb-vuln,.tmb-tool,.tmb-ctabox,.tmb-rcard{background:#f5f5f5 !important;border-color:#ccc !important}
+  .tmb-alink,.tmb-snum,.tmb-slabel,.tmb-sectitle{color:#c0392b !important}
+}
 </style>
 </head>
 <body>
-<div id="tmb"></div>
+
+<div id="predaxia-tmb-intro">
+  <div class="tmb-i-badge">PREDAXIA &middot; INTERACTIVE TOOL</div>
+  <h1 class="tmb-i-h1">Threat Model Builder</h1>
+  <div class="tmb-i-sub">For journalists, lawyers, NGOs, military families, divorce, high-risk travel &mdash; anyone with something to lose.</div>
+  <div class="tmb-i-redline"></div>
+  <p class="tmb-i-lede">A personalized OPSEC score, the vulnerabilities the score reveals, and the exact articles to close each one. Runs entirely in your browser. No account. No data collection.</p>
+  <div class="tmb-i-meta">
+    <span>Interactive &middot; 3 min</span><span>&middot;</span>
+    <span>5 questions</span><span>&middot;</span>
+    <span>Updated April 2026</span>
+  </div>
+  <p class="tmb-i-dispatch">Want the method instead of the tool? Read <a href="https://predaxia.com/how-to-build-threat-model/">how to build a threat model in 20 minutes</a>. Want the definition first? See the <a href="https://predaxia.com/glossary/threat-model/">glossary entry</a>.</p>
+</div>
+
+<div id="predaxia-tmb"></div>
+
+<div id="predaxia-tmb-faq">
+  <h2 class="tmb-f-h2">Frequently asked questions</h2>
+
+  <h3 class="tmb-f-h3">Should I use this builder or read the article instead?</h3>
+  <p class="tmb-f-p">Both. The builder gives you a personalized result in three minutes for your specific profile, your assets, your adversaries, and your current setup. The article on <a href="https://predaxia.com/how-to-build-threat-model/">how to build a threat model in 20 minutes</a> explains the method that powers it.</p>
+
+  <h3 class="tmb-f-h3">Is this Threat Model Builder free?</h3>
+  <p class="tmb-f-p">Yes. The builder runs entirely in your browser. No account, no email, no payment, no tracking. Your answers are not transmitted, logged, or stored anywhere. Once the page has loaded, you can disconnect from the internet and the tool still works.</p>
+
+  <h3 class="tmb-f-h3">How is this different from Microsoft Threat Modeling Tool or OWASP Threat Dragon?</h3>
+  <p class="tmb-f-p">Those tools are designed for software architects modeling application threats: data flow diagrams, STRIDE categories, mitigation libraries for code-level vulnerabilities. This builder is designed for individuals modeling personal exposure: a journalist with sources, a lawyer with privileged communications, a parent in a custody dispute, a deployed family with social media exposure.</p>
+
+  <h3 class="tmb-f-h3">Why are data brokers in the questionnaire?</h3>
+  <p class="tmb-f-p">Data brokers aggregate your home address, phone numbers, family members, vehicle registration, and behavioral history into commercial databases. For most adversary models, broker data is the cheapest entry point. Removing yourself from broker databases closes more attack surface in two weeks than most security tools close in a year.</p>
+
+  <h3 class="tmb-f-h3">Will my answers be saved if I close the page?</h3>
+  <p class="tmb-f-p">No. By design. The promise of zero storage is incompatible with persistence. If you want to keep your result, copy it to your clipboard or print it from the result screen.</p>
+</div>
+
 <script>
 (function(){
-var el=document.getElementById("tmb");
-if(!el)return;
+  function init(){
+    var el=document.getElementById("predaxia-tmb");
+    if(!el)return;
 
-var P=[
-{id:"journalist",label:"Journalist",icon:"\u{1F4E1}",sub:"Source protection \u00B7 hostile environments"},
-{id:"lawyer",label:"Lawyer / Notary",icon:"\u2696\uFE0F",sub:"Client data \u00B7 legal confidentiality"},
-{id:"ngo",label:"NGO / Expat",icon:"\u{1F30D}",sub:"Field security \u00B7 border crossings"},
-{id:"military",label:"Military Family",icon:"\u{1F396}\uFE0F",sub:"Location \u00B7 deployment OPSEC"},
-{id:"divorce",label:"Divorce / Legal",icon:"\u{1F512}",sub:"Device audits \u00B7 evidence protection"},
-{id:"travel",label:"High-Risk Travel",icon:"\u2708\uFE0F",sub:"Border agents \u00B7 hostile networks"},
-{id:"anyone",label:"Anyone",icon:"\u{1F464}",sub:"Data brokers \u00B7 mass surveillance \u00B7 digital hygiene"}
-];
+    var SV={
+      journalist:'<svg viewBox="0 0 24 24"><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21L7 19l-1.21-2.79c-.5-.93-.5-2.03 0-2.96L7 10l2.03.79c.5.23.97.66.97 1.21v2.66Z"/><path d="m18 6 .89 1.78a1 1 0 0 0 .67.55l1.95.39a1 1 0 0 1 .55 1.69l-1.41 1.39a1 1 0 0 0-.29.88l.33 1.95a1 1 0 0 1-1.45 1.05L18 14.77l-1.78.89a1 1 0 0 1-1.45-1.05l.33-1.95a1 1 0 0 0-.29-.88l-1.41-1.39a1 1 0 0 1 .55-1.69l1.95-.39a1 1 0 0 0 .67-.55L18 6Z"/></svg>',
+      lawyer:'<svg viewBox="0 0 24 24"><path d="M16 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>',
+      ngo:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+      military:'<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>',
+      divorce:'<svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      travel:'<svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+      anyone:'<svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+    };
 
-var AS={
-journalist:[{id:"sources",label:"Source identities & communications"},{id:"unpublished",label:"Unpublished materials & drafts"},{id:"devices",label:"Devices with sensitive data"},{id:"location",label:"Your location & movements"},{id:"metadata",label:"Communication metadata"}],
-lawyer:[{id:"clientdata",label:"Client files & case data"},{id:"comms",label:"Privileged communications"},{id:"credentials",label:"Portal & system credentials"},{id:"courtdocs",label:"Court documents & filings"},{id:"financials",label:"Client financial records"}],
-ngo:[{id:"fielddata",label:"Field reports & beneficiary data"},{id:"contacts",label:"Local contacts & partners"},{id:"comms",label:"Internal communications"},{id:"devices",label:"Devices crossing borders"},{id:"location",label:"Team locations & movements"}],
-military:[{id:"deployment",label:"Deployment schedule & location"},{id:"homeaddress",label:"Home address & family details"},{id:"routine",label:"Daily routine & children's schools"},{id:"social",label:"Social media exposure"},{id:"comms",label:"Communications with deployed member"}],
-divorce:[{id:"messages",label:"Private messages & calls"},{id:"location",label:"Location history"},{id:"financial",label:"Financial records & accounts"},{id:"evidence",label:"Digital evidence for court"},{id:"devices",label:"Shared devices & accounts"}],
-travel:[{id:"devices",label:"Devices at border crossings"},{id:"comms",label:"Communications in-country"},{id:"credentials",label:"Account credentials"},{id:"location",label:"Real-time location"},{id:"data",label:"Sensitive files on device"}],
-anyone:[{id:"passwords",label:"Passwords & online accounts"},{id:"browsing",label:"Browsing history & search data"},{id:"location",label:"Location data (phone, apps, carrier)"},{id:"identity",label:"Personal identity (name, address, SSN)"},{id:"financial",label:"Financial accounts & transactions"},{id:"photos",label:"Photos, messages & private files"}]
-};
+    var P=[
+      {id:"journalist",label:"Journalist",svg:SV.journalist,sub:"Source protection \u00B7 hostile environments"},
+      {id:"lawyer",label:"Lawyer / Notary",svg:SV.lawyer,sub:"Client data \u00B7 legal confidentiality"},
+      {id:"ngo",label:"NGO / Expat",svg:SV.ngo,sub:"Field security \u00B7 border crossings"},
+      {id:"military",label:"Military Family",svg:SV.military,sub:"Location \u00B7 deployment OPSEC"},
+      {id:"divorce",label:"Divorce / Legal",svg:SV.divorce,sub:"Device audits \u00B7 evidence protection"},
+      {id:"travel",label:"High-Risk Travel",svg:SV.travel,sub:"Border agents \u00B7 hostile networks"},
+      {id:"anyone",label:"Anyone",svg:SV.anyone,sub:"Data brokers \u00B7 mass surveillance \u00B7 digital hygiene"}
+    ];
 
-var ADV={
-journalist:[{id:"state",label:"State surveillance",severity:3},{id:"border",label:"Border agents",severity:2},{id:"corporate",label:"Corporate actors",severity:1},{id:"criminal",label:"Criminal organizations",severity:2}],
-lawyer:[{id:"breach",label:"Data breach / hackers",severity:2},{id:"opposing",label:"Opposing counsel / parties",severity:1},{id:"insider",label:"Insider threat (staff)",severity:1},{id:"state",label:"State-level legal requests",severity:2}],
-ngo:[{id:"state",label:"Host country government",severity:3},{id:"border",label:"Border agents",severity:2},{id:"local",label:"Local armed groups",severity:3},{id:"surveillance",label:"Network surveillance",severity:2}],
-military:[{id:"osint",label:"Foreign intelligence (OSINT)",severity:3},{id:"databrokers",label:"Data brokers",severity:2},{id:"social",label:"Social engineering",severity:1},{id:"stalking",label:"Targeted stalking",severity:2}],
-divorce:[{id:"spouse",label:"Current or ex spouse",severity:2},{id:"spyware",label:"Consumer spyware (mSpy, FlexiSpy)",severity:2},{id:"lawyer",label:"Opposing legal team",severity:1},{id:"social",label:"Social media monitoring",severity:1}],
-travel:[{id:"border",label:"Border agents (device search)",severity:2},{id:"network",label:"Hostile networks (hotel, airport)",severity:2},{id:"state",label:"State surveillance in-country",severity:3},{id:"theft",label:"Device theft or seizure",severity:2}],
-anyone:[{id:"databrokers",label:"Data brokers selling your info",severity:2},{id:"isp",label:"ISP logging your activity",severity:1},{id:"bigtech",label:"Big tech (Google, Meta, Apple)",severity:1},{id:"hackers",label:"Hackers & credential stuffing",severity:2},{id:"stalker",label:"Stalker or someone you know",severity:2}]
-};
+    var AS={
+      journalist:[{id:"sources",l:"Source identities and communications"},{id:"unpublished",l:"Unpublished materials and drafts"},{id:"devices",l:"Devices with sensitive data"},{id:"location",l:"Your location and movements"},{id:"metadata",l:"Communication metadata"}],
+      lawyer:[{id:"clientdata",l:"Client files and case data"},{id:"comms",l:"Privileged communications"},{id:"credentials",l:"Portal and system credentials"},{id:"courtdocs",l:"Court documents and filings"},{id:"financials",l:"Client financial records"}],
+      ngo:[{id:"fielddata",l:"Field reports and beneficiary data"},{id:"contacts",l:"Local contacts and partners"},{id:"comms",l:"Internal communications"},{id:"devices",l:"Devices crossing borders"},{id:"location",l:"Team locations and movements"}],
+      military:[{id:"deployment",l:"Deployment schedule and location"},{id:"homeaddress",l:"Home address and family details"},{id:"routine",l:"Daily routine and children schools"},{id:"social",l:"Social media exposure"},{id:"comms",l:"Communications with deployed member"}],
+      divorce:[{id:"messages",l:"Private messages and calls"},{id:"location",l:"Location history"},{id:"financial",l:"Financial records and accounts"},{id:"evidence",l:"Digital evidence for court"},{id:"devices",l:"Shared devices and accounts"}],
+      travel:[{id:"devices",l:"Devices at border crossings"},{id:"comms",l:"Communications in-country"},{id:"credentials",l:"Account credentials"},{id:"location",l:"Real-time location"},{id:"data",l:"Sensitive files on device"}],
+      anyone:[{id:"passwords",l:"Passwords and online accounts"},{id:"browsing",l:"Browsing history and search data"},{id:"location",l:"Location data (phone, apps, carrier)"},{id:"identity",l:"Personal identity (name, address, family)"},{id:"financial",l:"Financial accounts and transactions"},{id:"photos",l:"Photos, messages and private files"}]
+    };
 
-var SQ=[
-{id:"messaging",q:"Encrypted messaging?",options:["Signal","WhatsApp","Telegram","SMS only","Not sure"]},
-{id:"vpn",q:"VPN?",options:["Mullvad/Proton","Other paid","Free VPN","None"]},
-{id:"passwords",q:"Password manager?",options:["1Password","Bitwarden","Other","None"]},
-{id:"twofa",q:"2FA enabled?",options:["Hardware key","Auth app","SMS codes","None"]},
-{id:"device",q:"Separate work device?",options:["Yes, dedicated","Sometimes","No, one device"]}
-];
+    var ADV={
+      journalist:[{id:"state",l:"State surveillance",s:3},{id:"border",l:"Border agents",s:2},{id:"corporate",l:"Corporate actors",s:1},{id:"criminal",l:"Criminal organizations",s:2}],
+      lawyer:[{id:"breach",l:"Data breach / hackers",s:2},{id:"opposing",l:"Opposing counsel / parties",s:1},{id:"insider",l:"Insider threat (staff)",s:1},{id:"state",l:"State-level legal requests",s:2}],
+      ngo:[{id:"state",l:"Host country government",s:3},{id:"border",l:"Border agents",s:2},{id:"local",l:"Local armed groups",s:3},{id:"surveillance",l:"Network surveillance",s:2}],
+      military:[{id:"osint",l:"Foreign intelligence (OSINT)",s:3},{id:"databrokers",l:"Data brokers",s:2},{id:"social",l:"Social engineering",s:1},{id:"stalking",l:"Targeted stalking",s:2}],
+      divorce:[{id:"spouse",l:"Current or ex spouse",s:2},{id:"spyware",l:"Consumer spyware",s:2},{id:"lawyer",l:"Opposing legal team",s:1},{id:"social",l:"Social media monitoring",s:1}],
+      travel:[{id:"border",l:"Border agents (device search)",s:2},{id:"network",l:"Hostile networks (hotel, airport)",s:2},{id:"state",l:"State surveillance in-country",s:3},{id:"theft",l:"Device theft or seizure",s:2}],
+      anyone:[{id:"databrokers",l:"Data brokers selling your info",s:2},{id:"isp",l:"ISP logging your activity",s:1},{id:"bigtech",l:"Big tech (Google, Meta, Apple)",s:1},{id:"hackers",l:"Hackers and credential stuffing",s:2},{id:"stalker",l:"Stalker or someone you know",s:2}]
+    };
 
-var SC={
-messaging:{"Signal":0,"WhatsApp":1,"Telegram":2,"SMS only":3,"Not sure":3},
-vpn:{"Mullvad/Proton":0,"Other paid":1,"Free VPN":3,"None":2},
-passwords:{"1Password":0,"Bitwarden":0,"Other":1,"None":3},
-twofa:{"Hardware key":0,"Auth app":0,"SMS codes":2,"None":3},
-device:{"Yes, dedicated":0,"Sometimes":1,"No, one device":2}
-};
+    var SQ=[
+      {id:"messaging",q:"Messaging",ctx:"How you communicate with sources, clients, family, or anyone whose words matter.",opts:["Signal","WhatsApp","Telegram","SMS only","Not sure"]},
+      {id:"vpn",q:"VPN",ctx:"What stands between your ISP and the sites you visit.",opts:["Mullvad / Proton","Other paid","Free VPN","None"]},
+      {id:"passwords",q:"Passwords",ctx:"How your credentials are stored across accounts.",opts:["1Password","Bitwarden","Other manager","Reused / memory","None"]},
+      {id:"twofa",q:"Two-factor authentication",ctx:"What happens when someone has your password.",opts:["Hardware key","Auth app","SMS codes","None"]},
+      {id:"brokers",q:"Data broker exposure",ctx:"Your home address, phone, and family members are aggregated and sold by data brokers. Removing them closes more attack surface than any single tool.",opts:["DeleteMe / similar","Manual opt-outs done","Tried, gave up","Never checked"]}
+    ];
 
-var REC={
-messaging:{high:{text:"Your messaging is a critical vulnerability. Switch to Signal with disappearing messages enabled.",article:"/signal-vs-protonmail-vs-wire/",articleTitle:"Signal vs ProtonMail vs Wire"},medium:{text:"Your messaging could expose metadata. Consider Signal for sensitive communications.",article:"/signal-vs-protonmail-vs-wire/",articleTitle:"Signal vs ProtonMail vs Wire"}},
-vpn:{high:{text:"Without a trustworthy VPN, your ISP logs every site you visit. Free VPNs sell your data.",article:"/free-vpns-sell-your-data/",articleTitle:"Free VPNs sell your data"},medium:{text:"Verify your VPN provider's no-logs policy and jurisdiction.",article:"/proton-vs-mullvad-2026/",articleTitle:"Proton vs Mullvad"}},
-passwords:{high:{text:"No password manager means reused passwords. One breach exposes everything.",article:"/1password-review-for-journalists/",articleTitle:"1Password review for journalists"},medium:{text:"Consider 1Password's Travel Mode if you cross borders with sensitive data.",article:"/1password-review-for-journalists/",articleTitle:"1Password review"}},
-twofa:{high:{text:"SMS codes can be intercepted via SS7 attacks or SIM swaps. Switch to an authenticator app.",article:"/how-to-build-threat-model/",articleTitle:"Build your threat model"},medium:{text:"SMS-based 2FA is better than nothing, but vulnerable to real-time interception.",article:"/how-to-build-threat-model/",articleTitle:"Build your threat model"}},
-device:{high:{text:"One device means one seizure exposes everything. A travel device changes the equation.",article:"/security-checklist-before-traveling-to-high-risk-countries/",articleTitle:"Security checklist before traveling"},medium:{text:"Consider a dedicated device for your most sensitive activities.",article:"/how-to-build-threat-model/",articleTitle:"Build your threat model"}}
-};
+    var SC={
+      messaging:{Signal:0,WhatsApp:1,Telegram:2,"SMS only":3,"Not sure":3},
+      vpn:{"Mullvad / Proton":0,"Other paid":1,"Free VPN":3,None:2},
+      passwords:{"1Password":0,Bitwarden:0,"Other manager":1,"Reused / memory":3,None:3},
+      twofa:{"Hardware key":0,"Auth app":0,"SMS codes":2,None:3},
+      brokers:{"DeleteMe / similar":0,"Manual opt-outs done":1,"Tried, gave up":2,"Never checked":3}
+    };
 
-var ART={
-journalist:[{t:"A journalist was arrested because of an email",u:"/journalist-arrested-because-of-email/"},{t:"How to communicate with sources safely",u:"/how-to-communicate-with-confidential-sources-safely/"},{t:"Your device was seized. What they extract in 6 hours",u:"/device-seized-what-they-can-extract/"}],
-lawyer:[{t:"GDPR compliance for solo lawyers and small law firms",u:"/gdpr-compliance-law-firm-solo-lawyer/"},{t:"1Password review for journalists 2026",u:"/1password-review-for-journalists/"},{t:"How to build your threat model in 20 minutes",u:"/how-to-build-threat-model/"}],
-ngo:[{t:"Digital privacy guide for NGO workers abroad",u:"/digital-privacy-guide-ngo-workers-abroad/"},{t:"Secure communications in the field",u:"/secure-communications-field-ngo-guide/"},{t:"An NGO worker's phone was searched at the border",u:"/ngo-workers-phone-searched-border/"}],
-military:[{t:"Your phone carrier sells your location data",u:"/phone-carrier-sells-location-data/"},{t:"Is your phone being monitored? 8 signs",u:"/is-your-phone-being-monitored/"},{t:"How to build your threat model in 20 minutes",u:"/how-to-build-threat-model/"}],
-divorce:[{t:"Your spouse is probably reading your messages",u:"/spouse-reading-your-messages/"},{t:"Digital privacy checklist before filing for divorce",u:"/digital-privacy-checklist-before-divorce/"},{t:"Deleting evidence vs protecting yourself",u:"/deleting-evidence-vs-protecting-yourself/"}],
-travel:[{t:"Security checklist before traveling to high-risk countries",u:"/security-checklist-before-traveling-to-high-risk-countries/"},{t:"Border agents seized a journalist's laptop",u:"/border-agents-seized-journalists-laptop/"},{t:"VPNs that work in China, Iran, and Russia",u:"/vpns-that-work-in-china-iran-russia/"}],
-anyone:[{t:"How to build your threat model in 20 minutes",u:"/how-to-build-threat-model/"},{t:"Incognito mode doesn't hide what you think it does",u:"/incognito-mode-doesnt-hide-what-you-think/"},{t:"Your phone carrier sells your location data",u:"/phone-carrier-sells-location-data/"},{t:"Free VPNs sell your data. Here's what they collect",u:"/free-vpns-sell-your-data/"},{t:"A VPN won't save you if this already happened",u:"/vpn-wont-save-you-if-this-already-happened/"}]
-};
+    var REC={
+      messaging:{high:{t:"Your messaging is a critical vulnerability. Switch to Signal with disappearing messages, and disable notification previews on iOS.",a:"https://predaxia.com/signal-vs-protonmail-vs-wire/",at:"Signal vs ProtonMail vs Wire"},medium:{t:"Your messaging may expose metadata even if content is encrypted. Signal remains the operational baseline.",a:"https://predaxia.com/signal-vs-protonmail-vs-wire/",at:"Signal vs ProtonMail vs Wire"}},
+      vpn:{high:{t:"Without a trustworthy VPN, your ISP logs every site you visit. Free VPNs sell your data, that is documented.",a:"https://predaxia.com/free-vpns-sell-your-data/",at:"Free VPNs sell your data"},medium:{t:"Verify your VPN provider no-logs policy and jurisdiction.",a:"https://predaxia.com/proton-vs-mullvad-2026/",at:"Proton vs Mullvad"}},
+      passwords:{high:{t:"Reused or memorized passwords mean one breach exposes everything. A password manager is not optional in 2026.",a:"https://predaxia.com/1password-review-for-journalists/",at:"1Password review for journalists"},medium:{t:"If you cross borders with sensitive data, 1Password Travel Mode hides selected vaults from device inspection.",a:"https://predaxia.com/1password-review-for-journalists/",at:"1Password review"}},
+      twofa:{high:{t:"SMS codes can be intercepted via SS7 or SIM swap. Switch to an authenticator app or a hardware key.",a:"https://predaxia.com/how-to-build-threat-model/",at:"Build your threat model"},medium:{t:"SMS-based two-factor is better than nothing, but it is the weakest of the available factors.",a:"https://predaxia.com/how-to-build-threat-model/",at:"Build your threat model"}},
+      brokers:{high:{t:"Data brokers have aggregated your home address, phone, and family members into commercial databases. For most threat models, this is the cheapest entry point an adversary will find.",a:"https://predaxia.com/data-brokers-archive-not-delete/",at:"Data brokers do not delete you, they archive you"},medium:{t:"You started, you stopped. The brokers re-list within months unless removal is monitored continuously.",a:"https://predaxia.com/deleteme-review-2026/",at:"DeleteMe review 2026"}}
+    };
 
-var s={step:0,profile:null,assets:[],adversaries:[],setup:{},copied:false};
+    var TOOLS=[
+      {n:"Proton Unlimited",d:"Encrypted email, VPN, secure storage. The tool we use ourselves.",u:"https://predaxia.com/go/proton/"},
+      {n:"Mullvad VPN",d:"No email, no name, cash payment accepted. Most anonymous VPN available.",u:"https://predaxia.com/mullvad-vpn-review-2026/"},
+      {n:"1Password",d:"Password manager with Travel Mode for border crossings.",u:"https://predaxia.com/1password-review-for-journalists/"},
+      {n:"DeleteMe",d:"Continuous data broker removal and re-listing monitoring.",u:"https://predaxia.com/deleteme-review-2026/"}
+    ];
 
-function render(){
-var h="";
-// Progress bar
-if(s.step<5){
-h+='<div class="tmb-progress">';
-for(var i=0;i<5;i++){
-var cls="tmb-pdot";
-if(i<s.step)cls+=" done";
-if(i===s.step)cls+=" active";
-h+='<div class="'+cls+'"></div>';
-}
-h+='</div>';
-}
+    var st={step:0,profile:null,assets:[],adversaries:[],setup:{}};
+    function has(a,id){return a.indexOf(id)!==-1}
+    function tog(a,id){return has(a,id)?a.filter(function(x){return x!==id}):a.concat([id])}
 
-// Step 0: Profile
-if(s.step===0){
-h+='<div class="tmb-fade">';
-h+='<div class="tmb-slabel">STEP 1 OF 5</div>';
-h+='<div class="tmb-stitle">Who are you?</div>';
-h+='<div class="tmb-sdesc">Your profile determines your threat landscape. Pick the one that fits best.</div>';
-h+='<div class="tmb-grid2">';
-for(var i=0;i<P.length;i++){
-if(P[i].id==="anyone")continue;
-var sel=s.profile===P[i].id?" sel":"";
-h+='<div class="tmb-pcard'+sel+'" data-profile="'+P[i].id+'">';
-h+='<span class="tmb-icon">'+P[i].icon+'</span>';
-h+='<div class="tmb-plabel">'+P[i].label+'</div>';
-h+='<div class="tmb-psub">'+P[i].sub+'</div>';
-h+='</div>';
-}
-h+='</div>';
-var ap=P[P.length-1];
-var asel=s.profile==="anyone"?" sel":"";
-h+='<div class="tmb-pcard tmb-anyone'+asel+'" data-profile="anyone">';
-h+='<span style="font-size:22px;flex-shrink:0">'+ap.icon+'</span>';
-h+='<div><div class="tmb-plabel">'+ap.label+'</div>';
-h+='<div class="tmb-psub">None of the above. I just want to take back control of my digital life.</div></div>';
-h+='</div></div>';
-}
+    function render(){
+      var s=st,h="";
+      h+='<div class="tmb-progress">';
+      for(var i=0;i<5;i++){var c="tmb-pdot";if(i<s.step)c+=" done";if(i===s.step)c+=" active";h+='<div class="'+c+'"></div>';}
+      h+='</div>';
 
-// Step 1: Assets
-if(s.step===1&&s.profile){
-var items=AS[s.profile]||[];
-h+='<div class="tmb-fade">';
-h+='<div class="tmb-slabel">STEP 2 OF 5</div>';
-h+='<div class="tmb-stitle">What are you protecting?</div>';
-h+='<div class="tmb-sdesc">Select everything that matters. The more specific, the better the result.</div>';
-for(var i=0;i<items.length;i++){
-var on=s.assets.indexOf(items[i].id)!==-1;
-h+='<div class="tmb-chk'+(on?" sel":"")+'" data-asset="'+items[i].id+'">';
-h+='<div class="tmb-box'+(on?" on":"")+'">'+(on?"\u2713":"")+'</div>';
-h+='<div class="tmb-clbl">'+items[i].label+'</div></div>';
-}
-h+='</div>';
-}
+      if(s.step===0){
+        h+='<div class="tmb-fade"><div class="tmb-slabel">STEP 1 OF 5</div><div class="tmb-stitle">Who are you?</div><div class="tmb-sdesc">Your profile determines your threat landscape. Pick the one that fits best.</div><div class="tmb-grid2">';
+        P.forEach(function(p){if(p.id==="anyone")return;h+='<div class="tmb-pcard'+(s.profile===p.id?' sel':'')+'" data-p="'+p.id+'"><div class="tmb-icon">'+(p.svg||'')+'</div><div class="tmb-plabel">'+p.label+'</div><div class="tmb-psub">'+p.sub+'</div></div>';});
+        h+='</div>';
+        var ap=P[6];
+        h+='<div class="tmb-pcard tmb-anyone'+(s.profile==="anyone"?' sel':'')+'" data-p="anyone"><div class="tmb-icon">'+(ap.svg||'')+'</div><div><div class="tmb-plabel">'+ap.label+'</div><div class="tmb-psub">None of the above. I just want to take back control of my digital life.</div></div></div></div>';
+      }
 
-// Step 2: Adversaries
-if(s.step===2&&s.profile){
-var items=ADV[s.profile]||[];
-h+='<div class="tmb-fade">';
-h+='<div class="tmb-slabel">STEP 3 OF 5</div>';
-h+='<div class="tmb-stitle">Who are you protecting against?</div>';
-h+='<div class="tmb-sdesc">Select the adversaries relevant to your situation. Dots indicate threat severity.</div>';
-for(var i=0;i<items.length;i++){
-var on=s.adversaries.indexOf(items[i].id)!==-1;
-h+='<div class="tmb-chk'+(on?" sel":"")+'" data-adv="'+items[i].id+'">';
-h+='<div class="tmb-box'+(on?" on":"")+'">'+(on?"\u2713":"")+'</div>';
-h+='<div class="tmb-clbl">'+items[i].label+'</div>';
-h+='<div class="tmb-dots">';
-for(var d=1;d<=3;d++){h+='<div class="tmb-dot'+(d<=items[i].severity?" on":"")+'"></div>';}
-h+='</div></div>';
-}
-h+='</div>';
-}
+      if(s.step===1&&s.profile){
+        var items=AS[s.profile]||[];
+        h+='<div class="tmb-fade"><div class="tmb-slabel">STEP 2 OF 5</div><div class="tmb-stitle">What are you protecting?</div><div class="tmb-sdesc">Select everything that matters. The tool will use this to weight the recommendations.</div>';
+        items.forEach(function(a){var sel=has(s.assets,a.id);h+='<div class="tmb-chk'+(sel?' sel':'')+'" data-a="'+a.id+'"><div class="tmb-box'+(sel?' on':'')+'">'+(sel?"\u2713":"")+'</div><div class="tmb-clbl">'+a.l+'</div></div>';});
+        h+='</div>';
+      }
 
-// Step 3: Setup
-if(s.step===3){
-h+='<div class="tmb-fade">';
-h+='<div class="tmb-slabel">STEP 4 OF 5</div>';
-h+='<div class="tmb-stitle">What\'s your current setup?</div>';
-h+='<div class="tmb-sdesc">Be honest. This is where we find the gaps.</div>';
-for(var i=0;i<SQ.length;i++){
-var q=SQ[i];
-h+='<div class="tmb-srow"><div class="tmb-sq">'+q.q+'</div><div class="tmb-sopts">';
-for(var j=0;j<q.options.length;j++){
-var sel=s.setup[q.id]===q.options[j]?" sel":"";
-h+='<button class="tmb-sbtn'+sel+'" data-qid="'+q.id+'" data-val="'+q.options[j]+'">'+q.options[j]+'</button>';
-}
-h+='</div></div>';
-}
-h+='</div>';
-}
+      if(s.step===2&&s.profile){
+        var advs=ADV[s.profile]||[];
+        h+='<div class="tmb-fade"><div class="tmb-slabel">STEP 3 OF 5</div><div class="tmb-stitle">Who are you protecting against?</div><div class="tmb-sdesc">Select the adversaries you actually face. Dots indicate severity in your profile.</div>';
+        advs.forEach(function(a){var sel=has(s.adversaries,a.id);h+='<div class="tmb-chk'+(sel?' sel':'')+'" data-d="'+a.id+'"><div class="tmb-box'+(sel?' on':'')+'">'+(sel?"\u2713":"")+'</div><div class="tmb-clbl">'+a.l+'</div><div class="tmb-dots">';for(var d=1;d<=3;d++)h+='<div class="tmb-dot'+(d<=a.s?' on':'')+'"></div>';h+='</div></div>';});
+        h+='</div>';
+      }
 
-// Step 4: Results
-if(s.step===4){
-var r=comp();
-var pd=null;
-for(var i=0;i<P.length;i++){if(P[i].id===s.profile)pd=P[i];}
-var articles=ART[s.profile]||[];
-h+='<div class="tmb-fade">';
-h+='<div style="text-align:center;margin-bottom:40px">';
-h+='<div class="tmb-slabel">YOUR THREAT PROFILE</div>';
-h+='<div class="tmb-stitle" style="margin-bottom:24px">'+(pd?pd.label:"")+'</div>';
-h+='<div class="tmb-score" style="border-color:'+r.color+'">';
-h+='<div class="tmb-snum" style="color:'+r.color+'">'+r.pct+'</div>';
-h+='<div class="tmb-slbl2">'+r.level+'</div></div>';
-var msg=r.pct>=70?"Your setup is solid. No critical gaps detected. Stay sharp, stay maintained.":r.pct>=40?"You have real gaps. The vulnerabilities below are exploitable by the adversaries you selected.":"Your current setup has critical vulnerabilities. These are the ones that get people compromised.";
-h+='<div style="font-size:13px;color:#666;line-height:1.5">'+msg+'</div></div>';
+      if(s.step===3){
+        var ans=Object.keys(s.setup).length;
+        h+='<div class="tmb-fade"><div class="tmb-slabel">STEP 4 OF 5</div><div class="tmb-stitle">What does your current setup look like?</div><div class="tmb-sdesc">No judgment. Honest snapshot of where you stand right now. All five questions are required for an accurate score.</div>';
+        h+='<div class="tmb-stepcounter"><div class="tmb-stepcounter-label">QUESTIONS ANSWERED</div><div class="tmb-stepcounter-num">'+ans+' / '+SQ.length+'</div></div>';
+        SQ.forEach(function(q){
+          var done=!!s.setup[q.id];
+          h+='<div class="tmb-srow"><div class="tmb-sqhead"><div class="tmb-sq">'+q.q+'</div><div class="'+(done?'tmb-sqdone':'tmb-sqtodo')+'">'+(done?"ANSWERED \u2713":"REQUIRED")+'</div></div>';
+          h+='<div class="tmb-sqctx">'+q.ctx+'</div><div class="tmb-sopts">';
+          q.opts.forEach(function(o){h+='<button class="tmb-sbtn'+(s.setup[q.id]===o?' sel':'')+'" data-qid="'+q.id+'" data-val="'+o+'">'+o+'</button>';});
+          h+='</div></div>';
+        });
+        h+='</div>';
+      }
 
-if(r.vulns.length>0){
-h+='<div class="tmb-sectitle">Vulnerabilities identified: '+r.vulns.length+'</div>';
-for(var i=0;i<r.vulns.length;i++){
-var v=r.vulns[i];
-var bc=v.severity==="high"?"#c0392b":"#d4a017";
-var sc=v.severity==="high"?"#c0392b":"#d4a017";
-h+='<div class="tmb-vuln" style="border-left-color:'+bc+'">';
-h+='<div class="tmb-vtitle">'+v.area+'<span class="tmb-vsev" style="color:'+sc+'">'+v.severity+'</span></div>';
-h+='<div class="tmb-vtxt">'+v.text+'</div>';
-h+='<a href="https://predaxia.com'+v.article+'" target="_blank" rel="noopener" class="tmb-alink">Read: '+v.articleTitle+' \u2192</a>';
-h+='</div>';
-}
-}
+      if(s.step===4){
+        var r=comp();
+        var pL="";P.forEach(function(p){if(p.id===s.profile)pL=p.label;});
+        h+='<div class="tmb-fade"><div style="text-align:center;margin-bottom:40px"><div class="tmb-slabel">YOUR THREAT PROFILE</div><div class="tmb-stitle" style="margin-bottom:24px">'+pL+'</div>';
+        h+='<div class="tmb-score" style="border-color:'+r.color+'"><div class="tmb-snum" style="color:'+r.color+'">'+r.pct+'</div><div class="tmb-slbl">'+r.level+'</div></div>';
+        h+='<div style="font-size:13px;color:#888;line-height:1.55;max-width:520px;margin:0 auto">'+(r.pct>=70?"Your setup is solid. The gaps below are optimizations, not emergencies. You are already harder to compromise than most.":r.pct>=40?"You have exploitable gaps. The adversaries you selected can use these against you. Each fix below takes less than 30 minutes.":"Your current setup leaves you exposed. These are the exact gaps that get people compromised in real operations.")+'</div>';
+        h+='<div style="font-size:11px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-top:14px">Score based on '+SQ.length+' setup answers \u00B7 '+r.raw+'/'+r.mx+' raw points</div></div>';
 
-h+='<div class="tmb-sectitle">Recommended for your profile</div>';
-for(var i=0;i<articles.length;i++){
-h+='<a href="https://predaxia.com'+articles[i].u+'" target="_blank" rel="noopener" class="tmb-rcard">';
-h+='<div>'+articles[i].t+'</div><span class="tmb-rarrow">\u2192</span></a>';
-}
+        if(r.vulns.length>0){
+          h+='<div class="tmb-sectitle">Vulnerabilities identified \u00B7 '+r.vulns.length+'</div>';
+          r.vulns.forEach(function(v){var bc=v.severity==="high"?"#c0392b":"#d4a017";h+='<div class="tmb-vuln" style="border-left-color:'+bc+'"><div class="tmb-vtitle">'+v.area+'<span class="tmb-vsev" style="color:'+bc+'">'+v.severity+'</span></div><div class="tmb-vtxt">'+v.t+'</div><a href="'+v.a+'" class="tmb-alink">Read \u00B7 '+v.at+' \u2192</a></div>';});
+        }else{
+          h+='<div class="tmb-sectitle">Vulnerabilities identified \u00B7 0</div><div class="tmb-vuln" style="border-left-color:#2ecc71"><div class="tmb-vtitle">Clean sweep</div><div class="tmb-vtxt">No exploitable gaps detected across the five setup questions. The recommendations below are for maintenance and hardening.</div></div>';
+        }
 
-h+='<div class="tmb-closebox">';
-h+='<div class="tmb-closing">There\'s no perfect setup. Anyone selling you perfect is selling fear. The goal is simple: make yourself a harder target than the person next to you.</div>';
-h+='<div class="tmb-ctabox"><div class="tmb-ctatitle">Share your result</div>';
-h+='<div class="tmb-ctatxt">No data is stored. Your answers stayed in your browser.</div>';
-h+='<button class="tmb-sharebtn" id="tmb-share">'+(s.copied?"COPIED \u2713":"COPY RESULT TO CLIPBOARD")+'</button></div></div>';
-h+='<div class="tmb-privnote">This tool runs entirely in your browser. No data is collected, stored, or transmitted. Ever.</div>';
-h+='<button class="tmb-restart" id="tmb-restart">START OVER</button>';
-h+='</div>';
-}
+        h+='<div class="tmb-sectitle">Tools we tested and use ourselves</div><div class="tmb-toolgrid">';
+        TOOLS.forEach(function(t){h+='<a class="tmb-tool" href="'+t.u+'"><div class="tmb-tname">'+t.n+'</div><div class="tmb-tdesc">'+t.d+'</div></a>';});
+        h+='</div>';
 
-// Navigation
-if(s.step<4){
-var canN=false;
-if(s.step===0)canN=!!s.profile;
-if(s.step===1)canN=s.assets.length>0;
-if(s.step===2)canN=s.adversaries.length>0;
-if(s.step===3){var k=0;for(var x in s.setup)k++;canN=k>=3;}
-h+='<div class="tmb-nav">';
-if(s.step>0){h+='<button class="tmb-btn sec" id="tmb-back">\u2190 BACK</button>';}
-else{h+='<div></div>';}
-h+='<button class="tmb-btn pri'+(canN?"":" dis")+'" id="tmb-next"'+(canN?"":' disabled')+'>'+(s.step===3?"SEE RESULTS \u2192":"NEXT \u2192")+'</button>';
-h+='</div>';
-}
+        h+='<div class="tmb-closebox"><div class="tmb-closing">There is no perfect setup. Anyone selling you perfect is selling fear. The goal is simple: make yourself a harder target than the person next to you.</div>';
+        h+='<div class="tmb-ctabox"><div class="tmb-ctatitle">Keep your result</div><div class="tmb-ctatxt">Print or copy your report. Nothing is stored on our side.</div><div class="tmb-ctabtnrow"><button class="tmb-sharebtn" id="tmb-share">COPY TO CLIPBOARD</button><button class="tmb-printbtn" id="tmb-print">PRINT REPORT</button></div></div>';
+        h+='<div class="tmb-privnote">This tool runs entirely in your browser. No data is collected, stored, or transmitted. Ever.</div>';
+        h+='<button class="tmb-restart-pri" id="tmb-restart">\u21BA  START OVER</button></div>';
+        h+='<div class="tmb-stickynl"><div class="tmb-stickynl-inner"><div class="tmb-stickynl-txt">Weekly OPSEC Brief<small>One threat. One tool verdict. One action. Every week.</small></div><a href="https://predaxia.com/newsletter/" class="tmb-stickynl-btn">SUBSCRIBE \u2192</a></div></div>';
+        h+='</div>';
+      }
 
-el.innerHTML=h;
-bindE();
-}
+      if(s.step<4){
+        var cn=false;
+        if(s.step===0&&s.profile)cn=true;
+        if(s.step===1&&s.assets.length>0)cn=true;
+        if(s.step===2&&s.adversaries.length>0)cn=true;
+        if(s.step===3&&Object.keys(s.setup).length===SQ.length)cn=true;
+        h+='<div class="tmb-nav">';
+        if(s.step>0)h+='<button class="tmb-btn sec" id="tmb-back">\u2190 BACK</button>';
+        else h+='<div></div>';
+        var lbl=s.step===3?(cn?"SEE RESULTS \u2192":"ANSWER ALL "+SQ.length+" TO CONTINUE"):"NEXT \u2192";
+        h+='<button class="tmb-btn pri'+(cn?'':' dis')+'" id="tmb-next"'+(cn?'':' disabled')+'>'+lbl+'</button></div>';
+      }
 
-function bindE(){
-var cards=el.querySelectorAll("[data-profile]");
-for(var i=0;i<cards.length;i++){
-cards[i].addEventListener("click",function(){s.profile=this.getAttribute("data-profile");render();});
-}
-var assets=el.querySelectorAll("[data-asset]");
-for(var i=0;i<assets.length;i++){
-assets[i].addEventListener("click",function(){
-var id=this.getAttribute("data-asset");
-var idx=s.assets.indexOf(id);
-if(idx===-1)s.assets.push(id);else s.assets.splice(idx,1);
-render();
-});
-}
-var advs=el.querySelectorAll("[data-adv]");
-for(var i=0;i<advs.length;i++){
-advs[i].addEventListener("click",function(){
-var id=this.getAttribute("data-adv");
-var idx=s.adversaries.indexOf(id);
-if(idx===-1)s.adversaries.push(id);else s.adversaries.splice(idx,1);
-render();
-});
-}
-var btns=el.querySelectorAll(".tmb-sbtn");
-for(var i=0;i<btns.length;i++){
-btns[i].addEventListener("click",function(){
-s.setup[this.getAttribute("data-qid")]=this.getAttribute("data-val");
-render();
-});
-}
-var next=el.querySelector("#tmb-next");
-if(next)next.addEventListener("click",function(){if(s.step<4)s.step++;render();el.scrollIntoView({behavior:"smooth"});});
-var back=el.querySelector("#tmb-back");
-if(back)back.addEventListener("click",function(){if(s.step>0)s.step--;render();el.scrollIntoView({behavior:"smooth"});});
-var restart=el.querySelector("#tmb-restart");
-if(restart)restart.addEventListener("click",function(){s={step:0,profile:null,assets:[],adversaries:[],setup:{},copied:false};render();el.scrollIntoView({behavior:"smooth"});});
-var share=el.querySelector("#tmb-share");
-if(share)share.addEventListener("click",function(){
-var r=comp();
-var pl="";for(var i=0;i<P.length;i++){if(P[i].id===s.profile)pl=P[i].label;}
-var txt="My Threat Model Score: "+r.pct+"/100 ("+r.level+")\nProfile: "+pl+"\n"+r.vulns.length+" vulnerabilities identified\n\nBuild yours \u2192 predaxia.com/threat-model-builder/";
-if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){s.copied=true;render();setTimeout(function(){s.copied=false;render();},2000);});}
-});
-}
+      el.innerHTML=h;
+      bindE();
+    }
 
-function comp(){
-var vulns=[];
-var total=0;
-var max=15;
-for(var i=0;i<SQ.length;i++){
-var q=SQ[i];
-var ans=s.setup[q.id];
-if(!ans)continue;
-var sc=SC[q.id][ans]||0;
-total+=sc;
-var rec=REC[q.id];
-if(sc>=2&&rec&&rec.high){vulns.push({text:rec.high.text,article:rec.high.article,articleTitle:rec.high.articleTitle,severity:"high",area:q.q});}
-else if(sc===1&&rec&&rec.medium){vulns.push({text:rec.medium.text,article:rec.medium.article,articleTitle:rec.medium.articleTitle,severity:"medium",area:q.q});}
-}
-var sAdvs=ADV[s.profile]||[];
-var maxSev=0;
-for(var i=0;i<sAdvs.length;i++){if(s.adversaries.indexOf(sAdvs[i].id)!==-1&&sAdvs[i].severity>maxSev)maxSev=sAdvs[i].severity;}
-if(maxSev===3)total+=2;
-var pct=Math.max(0,Math.round(100-(total/max)*100));
-var color=pct>=70?"#2ecc71":pct>=40?"#d4a017":"#c0392b";
-var level=pct>=70?"SOLID":pct>=40?"EXPOSED":"CRITICAL";
-return{vulns:vulns,pct:pct,color:color,level:level};
-}
+    function comp(){
+      var vulns=[],total=0,mx=15;
+      SQ.forEach(function(q){var a=st.setup[q.id];if(!a)return;var sc=SC[q.id][a]||0;total+=sc;var rec=REC[q.id];if(sc>=2&&rec&&rec.high)vulns.push({t:rec.high.t,a:rec.high.a,at:rec.high.at,severity:"high",area:q.q});else if(sc===1&&rec&&rec.medium)vulns.push({t:rec.medium.t,a:rec.medium.a,at:rec.medium.at,severity:"medium",area:q.q});});
+      var advs=ADV[st.profile]||[];var mxS=0;
+      advs.forEach(function(a){if(has(st.adversaries,a.id)&&a.s>mxS)mxS=a.s;});
+      if(mxS===3)total+=2;
+      var pct=Math.max(0,Math.round(100-(total/mx)*100));
+      return{vulns:vulns,pct:pct,raw:total,mx:mx,color:pct>=70?"#2ecc71":pct>=40?"#d4a017":"#c0392b",level:pct>=70?"SOLID":pct>=40?"EXPOSED":"CRITICAL"};
+    }
 
-render();
+    function bindE(){
+      el.querySelectorAll("[data-p]").forEach(function(e){e.onclick=function(){st.profile=this.getAttribute("data-p");st.assets=[];st.adversaries=[];render();};});
+      el.querySelectorAll("[data-a]").forEach(function(e){e.onclick=function(){st.assets=tog(st.assets,this.getAttribute("data-a"));render();};});
+      el.querySelectorAll("[data-d]").forEach(function(e){e.onclick=function(){st.adversaries=tog(st.adversaries,this.getAttribute("data-d"));render();};});
+      el.querySelectorAll("[data-qid]").forEach(function(e){e.onclick=function(){st.setup[this.getAttribute("data-qid")]=this.getAttribute("data-val");render();};});
+      var nb=document.getElementById("tmb-next");if(nb)nb.onclick=function(){if(!this.disabled){st.step++;render();el.scrollIntoView({behavior:"smooth",block:"start"});}};
+      var bb=document.getElementById("tmb-back");if(bb)bb.onclick=function(){st.step--;render();el.scrollIntoView({behavior:"smooth",block:"start"});};
+      var rb=document.getElementById("tmb-restart");if(rb)rb.onclick=function(){st={step:0,profile:null,assets:[],adversaries:[],setup:{}};render();el.scrollIntoView({behavior:"smooth",block:"start"});};
+      var sb=document.getElementById("tmb-share");if(sb)sb.onclick=function(){var r=comp();var pL="";P.forEach(function(p){if(p.id===st.profile)pL=p.label;});var txt="PREDAXIA THREAT MODEL\n----------------------\nProfile: "+pL+"\nOPSEC Score: "+r.pct+"/100 ("+r.level+")\nRaw points: "+r.raw+"/"+r.mx+"\nVulnerabilities identified: "+r.vulns.length+"\n\nBuild yours: predaxia.com/threat-model-builder/";navigator.clipboard.writeText(txt).then(function(){sb.textContent="COPIED \u2713";setTimeout(function(){sb.textContent="COPY TO CLIPBOARD";},2000);});};
+      var pb=document.getElementById("tmb-print");if(pb)pb.onclick=function(){window.print();};
+    }
+
+    render();
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+  else init();
 })();
 </script>
+
 </body>
 </html>
