@@ -229,6 +229,4 @@ MIT — see [LICENSE](LICENSE). Use it, fork it, host it, modify it, ship it. At
 
 <br><br>
 
-<sub>Built with care in the EU · No trackers were harmed in the making of this tool</sub>
-
 </div>
